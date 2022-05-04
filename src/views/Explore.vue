@@ -1,9 +1,9 @@
 <template>
-  <span>kekl</span>
+  <span>asdf</span>
 </template>
 
 <script>
 export default {
-  name: "Home",
+  name: "Explore",
 };
 </script>
