@@ -13,7 +13,9 @@
 
     <v-spacer></v-spacer>
 
-    <v-btn class="mx-2" color="primary" text> Explore </v-btn>
+    <v-btn :to="{ name: 'Explore' }" class="mx-2" color="primary" text>
+      Explore
+    </v-btn>
 
     <v-btn @click="connectWallet" color="primary" outlined text>
       <span
