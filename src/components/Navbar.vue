@@ -20,11 +20,12 @@
     <v-btn @click="connectWallet" color="primary" outlined text>
       <span
         :class="`${
-          ETHERS_IS_ACCOUNT_CONNECTED ? 'success' : 'warning'
-        }--text mr-2`"
+          ETHERS_CONNECTED_ACCOUNT_ELLIPSIS ? 'success' : 'warning'
+        }--text mr-2 mx-auto`"
         >●</span
-      >
-      {{ ETHERS_CONNECTED_ACCOUNT }}
+      ><span class="d-none d-sm-flex">{{
+        ETHERS_CONNECTED_ACCOUNT_ELLIPSIS
+      }}</span>
     </v-btn>
   </v-app-bar>
 </template>
@@ -33,7 +34,7 @@
 import { mapGetters } from "vuex";
 import {
   ETHERS,
-  ETHERS_CONNECTED_ACCOUNT,
+  ETHERS_CONNECTED_ACCOUNT_ELLIPSIS,
   ETHERS_IS_ACCOUNT_CONNECTED,
 } from "../store/actions/ethers";
 import EthersService from "../services/ethers";
@@ -42,7 +43,7 @@ export default {
   name: "Navbar",
   computed: {
     ...mapGetters(ETHERS, [
-      ETHERS_CONNECTED_ACCOUNT,
+      ETHERS_CONNECTED_ACCOUNT_ELLIPSIS,
       ETHERS_IS_ACCOUNT_CONNECTED,
     ]),
   },
