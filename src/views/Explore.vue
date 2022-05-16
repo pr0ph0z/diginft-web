@@ -1,8 +1,8 @@
 <template>
   <v-row class="mt-4" v-masonry>
-    <v-col v-for="item in items" :key="item.id" cols="12" sm="6" md="4" lg="2">
-      <v-card max-width="300">
-        <v-img height="250" :src="item.image" />
+    <v-col v-for="item in items" :key="item.id" cols="12" sm="6" md="4" lg="3">
+      <v-card max-width="400">
+        <v-img @load="redrawVueMasonry" height="250" :src="item.image" />
 
         <v-card-title>{{ item.name }}</v-card-title>
 
@@ -50,6 +50,9 @@ export default {
     async getItems() {
       const items = await ItemService.get();
       this.items = items.data.data;
+    },
+    redrawVueMasonry() {
+      this.$redrawVueMasonry();
     },
   },
 };
