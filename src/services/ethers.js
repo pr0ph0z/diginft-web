@@ -51,4 +51,39 @@ export default class EthersService {
 
     return item;
   }
+
+  async burnItem(itemId) {
+    const eth = await ethereum();
+    if (!eth) {
+      return undefined;
+    }
+
+    const provider = new ethers.providers.Web3Provider(window.ethereum, "any");
+    const signer = provider.getSigner();
+    const contract = new ethers.Contract(contractAddress, DigiNFT.abi, signer);
+
+    const burn = await contract.burn(itemId);
+
+    await burn.wait();
+  }
+
+  async mint(metadataUrl, price, royalty, sellable) {
+    const eth = await ethereum();
+    if (!eth) {
+      return undefined;
+    }
+
+    const provider = new ethers.providers.Web3Provider(window.ethereum, "any");
+    const signer = provider.getSigner();
+    const contract = new ethers.Contract(contractAddress, DigiNFT.abi, signer);
+
+    const burn = await contract.createToken(
+      metadataUrl,
+      price,
+      royalty,
+      sellable
+    );
+
+    await burn.wait();
+  }
 }

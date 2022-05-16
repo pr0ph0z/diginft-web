@@ -25,7 +25,13 @@
             </v-tooltip>
           </v-card-text>
           <v-card-actions>
-            <v-btn @click="buyItem" color="primary">Buy Item</v-btn>
+            <v-btn v-if="!isThisMyItem" @click="buyItem" color="primary"
+              >Buy Item</v-btn
+            ><v-btn v-if="isThisMyItem" color="primary" outlined
+              >Update Item</v-btn
+            ><v-btn v-if="isThisMyItem" @click="burnDialog = true" color="error"
+              >Burn</v-btn
+            >
           </v-card-actions>
         </v-card>
 
@@ -48,12 +54,18 @@
                     <td>{{ log.type }}</td>
                     <td>
                       <a href="#" class="text-decoration-none">{{
-                        log.fromAddress.slice(0, 6)
+                        log.fromAddress.toLowerCase() ===
+                        ETHERS_CONNECTED_ACCOUNT.toLowerCase()
+                          ? "you"
+                          : log.fromAddress.slice(0, 6)
                       }}</a>
                     </td>
                     <td>
                       <a href="#" class="text-decoration-none">{{
-                        log.toAddress.slice(0, 6)
+                        log.toAddress.toLowerCase() ===
+                        ETHERS_CONNECTED_ACCOUNT.toLowerCase()
+                          ? "you"
+                          : log.toAddress.slice(0, 6)
                       }}</a>
                     </td>
                     <td>
@@ -84,36 +96,49 @@
               >Owned by
               <a href="#" class="text-decoration-none">
                 {{
-                  item.user.username || item.user.walletAddress.slice(0, 6)
+                  isThisMyItem
+                    ? "you"
+                    : item.user.username || item.user.walletAddress.slice(0, 6)
                 }}</a
               ></span
             >
-            <v-tooltip bottom>
-              <template v-slot:activator="{ on, attrs }">
-                <span v-bind="attrs" v-on="on" class="text-h4 text--primary"
-                  >{{ item.price | weiToEther }}Ξ</span
-                >
-              </template>
-              <span>{{ item.price | weiToEther }} ether</span>
-            </v-tooltip>
-            <p class="text--primary">
+            <p class="text--primary mt-2">
               {{ item.description }}
             </p>
           </v-card-text>
         </v-card></v-col
       >
     </v-row>
+
+    <modal
+      v-model="burnDialog"
+      :loading="burnDialogLoading"
+      :handler="burn"
+      :persistent="burnDialogPersistency"
+      title="Burn Item?"
+      description="This action is irreversible. Burning this item means the record won't be held in our smart contract anymore."
+      textButton="Burn"
+    />
   </div>
 </template>
 
 <script>
+import { mapGetters } from "vuex";
 import { format } from "date-fns";
-import { ethers, BigNumber } from "ethers";
+import { ethers, BigNumber, utils } from "ethers";
 import ItemService from "../services/item";
 import EthersService from "../services/ethers";
+import { ETHERS, ETHERS_CONNECTED_ACCOUNT } from "../store/actions/ethers";
+import Modal from "../components/Modal.vue";
+import DigiNFT from "../../contract.json";
+
+const contractAddress = "0x94eb31620b82ab808531499683bfdd9a7d87cddb";
 
 export default {
   name: "ItemDetail",
+  components: {
+    Modal,
+  },
   data: () => ({
     item: {
       price: 0,
@@ -123,10 +148,20 @@ export default {
         username: "",
       },
     },
+    burnDialog: false,
+    burnDialogLoading: false,
+    burnDialogPersistency: false,
   }),
   computed: {
+    ...mapGetters(ETHERS, [ETHERS_CONNECTED_ACCOUNT]),
     dataId() {
       return this.$route.params.id;
+    },
+    isThisMyItem() {
+      return (
+        this.item.user.walletAddress.toLowerCase() ===
+        this[ETHERS_CONNECTED_ACCOUNT].toLowerCase()
+      );
     },
   },
   filters: {
@@ -170,6 +205,41 @@ export default {
         royalty: parseInt(marketItem.royalty),
         sellable: marketItem.sellable,
       };
+    },
+    async burn() {
+      this.burnDialogLoading = true;
+      this.burnDialogPersistency = true;
+      try {
+        const ethersService = new EthersService();
+        await ethersService.burnItem(1);
+
+        const provider = new ethers.providers.Web3Provider(
+          window.ethereum,
+          "any"
+        );
+        const signer = provider.getSigner();
+        const contract = new ethers.Contract(
+          contractAddress,
+          DigiNFT.abi,
+          signer
+        );
+        const _this = this;
+        provider.once("block", () => {
+          contract.once(
+            {
+              topics: [utils.id("Burn(uint256)"), utils.hexValue(this.dataId)],
+            },
+            () => {
+              alert("lol!");
+              _this.burnDialogLoading = false;
+              _this.burnDialogPersistency = false;
+            }
+          );
+        });
+      } catch (error) {
+        this.burnDialogLoading = false;
+        this.burnDialogPersistency = false;
+      }
     },
   },
 };

@@ -3,6 +3,7 @@ import VueRouter from "vue-router";
 import Home from "../views/Home.vue";
 import Explore from "../views/Explore.vue";
 import ItemDetail from "../views/ItemDetail.vue";
+import Mint from "../views/Mint.vue";
 
 Vue.use(VueRouter);
 
@@ -21,6 +22,11 @@ const routes = [
     path: "/item/:id",
     name: "ItemDetail",
     component: ItemDetail,
+  },
+  {
+    path: "/mint",
+    name: "Mint",
+    component: Mint,
   },
 ];
 
