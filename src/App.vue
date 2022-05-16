@@ -24,12 +24,14 @@ export default {
   async beforeCreate() {
     const ethersService = new EthersService();
     const eth = await ethereum();
-    await ethersService.connectWallet();
-    eth.on("accountsChanged", async accounts => {
-      if (accounts.length === 0) {
-        this[ETHERS_SET_ACCOUNT](null);
-      }
-    });
+    if (eth !== undefined) {
+      await ethersService.connectWallet();
+      eth.on("accountsChanged", async accounts => {
+        if (accounts.length === 0) {
+          this[ETHERS_SET_ACCOUNT]("");
+        }
+      });
+    }
   },
   methods: {
     ...mapActions(ETHERS, [ETHERS_SET_ACCOUNT]),

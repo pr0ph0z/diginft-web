@@ -3,10 +3,11 @@ import {
   ETHERS_IS_ACCOUNT_CONNECTED,
   ETHERS_SET_ACCOUNT,
   ETHERS_SET_METAMASK_INSTALL_STATUS,
+  ETHERS_CONNECTED_ACCOUNT_ELLIPSIS,
 } from "../actions/ethers";
 
 const initialState = {
-  account: null,
+  account: "",
   isMetaMaskInstalled: false,
 };
 
@@ -32,10 +33,11 @@ export default {
     },
   },
   getters: {
-    [ETHERS_CONNECTED_ACCOUNT]: ({ account }) =>
+    [ETHERS_CONNECTED_ACCOUNT_ELLIPSIS]: ({ account }) =>
       account
         ? `${account.slice(0, 5)}...${account.slice(-3)}`
         : "Connect Wallet",
-    [ETHERS_IS_ACCOUNT_CONNECTED]: ({ account }) => account !== null,
+    [ETHERS_IS_ACCOUNT_CONNECTED]: ({ account }) => account !== "",
+    [ETHERS_CONNECTED_ACCOUNT]: ({ account }) => account,
   },
 };

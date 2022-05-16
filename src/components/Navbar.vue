@@ -17,10 +17,20 @@
       Explore
     </v-btn>
 
+    <v-btn
+      v-if="ETHERS_IS_ACCOUNT_CONNECTED"
+      :to="{ name: 'Mint' }"
+      class="mx-2"
+      color="primary"
+      text
+    >
+      Create
+    </v-btn>
+
     <v-btn @click="connectWallet" color="primary" outlined text>
       <span
         :class="`${
-          ETHERS_CONNECTED_ACCOUNT_ELLIPSIS ? 'success' : 'warning'
+          ETHERS_IS_ACCOUNT_CONNECTED ? 'success' : 'warning'
         }--text mr-2 mx-auto`"
         >●</span
       ><span class="d-none d-sm-flex">{{
