@@ -1,4 +1,4 @@
-export default async () => {
+export default () => {
   let ethereum;
 
   if (typeof window !== "undefined" && typeof window.ethereum != "undefined") {

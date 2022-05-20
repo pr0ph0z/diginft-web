@@ -4,16 +4,22 @@ import store from "../store";
 import { ETHERS, ETHERS_SET_ACCOUNT } from "../store/actions/ethers";
 import DigiNFT from "../../contract.json";
 
-const contractAddress = "0x94eb31620b82ab808531499683bfdd9a7d87cddb";
+const contractAddress = process.env.VUE_APP_CONTRACT_ADDRESS;
 
 export default class EthersService {
-  async connectWallet() {
-    const eth = await ethereum();
+  constructor() {
+    const eth = ethereum();
     if (!eth) {
       return undefined;
     }
+    this.eth = eth;
+    this.provider = new ethers.providers.Web3Provider(this.eth, "any");
+    const signer = this.provider.getSigner();
+    this.contract = new ethers.Contract(contractAddress, DigiNFT.abi, signer);
+  }
 
-    const accounts = await eth.request({
+  async connectWallet() {
+    const accounts = await this.eth.request({
       method: "eth_requestAccounts",
     });
     if (accounts.length !== 0) {
@@ -23,11 +29,6 @@ export default class EthersService {
   }
 
   async buyItem(itemId, sellable, price) {
-    const eth = await ethereum();
-    if (!eth) {
-      return undefined;
-    }
-
     const provider = new ethers.providers.Web3Provider(window.ethereum, "any");
     const signer = provider.getSigner();
     const contract = new ethers.Contract(contractAddress, DigiNFT.abi, signer);
@@ -38,11 +39,6 @@ export default class EthersService {
   }
 
   async getMarketItem(itemId) {
-    const eth = await ethereum();
-    if (!eth) {
-      return undefined;
-    }
-
     const provider = new ethers.providers.Web3Provider(window.ethereum, "any");
     const signer = provider.getSigner();
     const contract = new ethers.Contract(contractAddress, DigiNFT.abi, signer);
@@ -53,26 +49,12 @@ export default class EthersService {
   }
 
   async burnItem(itemId) {
-    const eth = await ethereum();
-    if (!eth) {
-      return undefined;
-    }
-
-    const provider = new ethers.providers.Web3Provider(window.ethereum, "any");
-    const signer = provider.getSigner();
-    const contract = new ethers.Contract(contractAddress, DigiNFT.abi, signer);
-
-    const burn = await contract.burn(itemId);
+    const burn = await this.contract.burn(itemId);
 
     await burn.wait();
   }
 
   async mint(metadataUrl, price, royalty, sellable) {
-    const eth = await ethereum();
-    if (!eth) {
-      return undefined;
-    }
-
     const provider = new ethers.providers.Web3Provider(window.ethereum, "any");
     const signer = provider.getSigner();
     const contract = new ethers.Contract(contractAddress, DigiNFT.abi, signer);
