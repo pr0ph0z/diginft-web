@@ -91,41 +91,32 @@ export default {
   computed: {
     ...mapGetters(ETHERS, [ETHERS_CONNECTED_ACCOUNT]),
   },
-  created() {
-    this.$socket.client.emit(
-      "join-room",
-      this[ETHERS_CONNECTED_ACCOUNT].toLowerCase()
-    );
-  },
   methods: {
     async mint() {
       try {
+        this.$socket.client.emit(
+          "join-room",
+          this[ETHERS_CONNECTED_ACCOUNT].toLowerCase()
+        );
         let metadata = { name: this.name, description: this.description };
         this.mintLoading = true;
         const client = create("https://ipfs.infura.io:5001/api/v0");
         this.mintLoadingText = "Uploading image to the IPFS...";
-        const image = await client.add(this.image, {
-          progress: prog => console.log(`received: ${prog}`),
-        });
+        const image = await client.add(this.image);
         metadata = {
           ...metadata,
           image: `https://ipfs.infura.io/ipfs/${image.path}`,
         };
         if (this.file !== null) {
           this.mintLoadingText = "Uploading file to the IPFS...";
-          const file = await client.add(this.file, {
-            progress: prog => console.log(`received: ${prog}`),
-          });
+          const file = await client.add(this.file);
           metadata = {
             ...metadata,
             file: `https://ipfs.infura.io/ipfs/${file.path}`,
           };
         }
         this.mintLoadingText = "Uploading metadata to the IPFS...";
-        const data = await client.add(JSON.stringify(metadata), {
-          progress: prog => console.log(`received: ${prog}`),
-        });
-        console.log(data);
+        const data = await client.add(JSON.stringify(metadata));
 
         const ethersService = new EthersService();
         this.mintLoadingText = "Waiting transaction to be accepted...";
