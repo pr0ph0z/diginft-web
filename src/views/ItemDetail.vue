@@ -5,7 +5,9 @@
         <v-img
           :src="item.image"
           aspect-ratio="1"
-          class="rounded-lg mx-auto fill-height"
+          :class="`rounded-lg mx-auto fill-height${
+            isItemBurned ? ' grayscale' : ''
+          }`"
         ></v-img>
       </v-col>
       <v-col md="4">
@@ -25,11 +27,24 @@
             </v-tooltip>
           </v-card-text>
           <v-card-actions>
-            <v-btn v-if="!isThisMyItem" @click="buyItem" color="primary"
+            <v-btn v-if="!item.sellable && !isThisMyItem" color="error" text
+              >Item is Not Sellable</v-btn
+            >
+            <v-btn v-if="isItemBurned" color="error" text>Item is Burned</v-btn>
+            <v-btn
+              v-if="!isThisMyItem && !isItemBurned && item.sellable"
+              @click="buyItem"
+              color="primary"
               >Buy Item</v-btn
-            ><v-btn v-if="isThisMyItem" color="primary" outlined
+            ><v-btn
+              v-if="isThisMyItem && !isItemBurned"
+              color="primary"
+              outlined
               >Update Item</v-btn
-            ><v-btn v-if="isThisMyItem" @click="burnDialog = true" color="error"
+            ><v-btn
+              v-if="isThisMyItem && !isItemBurned"
+              @click="burnDialog = true"
+              color="error"
               >Burn</v-btn
             >
           </v-card-actions>
@@ -130,9 +145,6 @@ import ItemService from "../services/item";
 import EthersService from "../services/ethers";
 import { ETHERS, ETHERS_CONNECTED_ACCOUNT } from "../store/actions/ethers";
 import Modal from "../components/Modal.vue";
-import DigiNFT from "../../contract.json";
-
-const contractAddress = "0x94eb31620b82ab808531499683bfdd9a7d87cddb";
 
 export default {
   name: "ItemDetail",
@@ -162,6 +174,12 @@ export default {
         this.item.user.walletAddress.toLowerCase() ===
         this[ETHERS_CONNECTED_ACCOUNT].toLowerCase()
       );
+    },
+    nullAddress() {
+      return ethers.constants.AddressZero;
+    },
+    isItemBurned() {
+      return this.item.user.walletAddress === this.nullAddress;
     },
   },
   filters: {
@@ -211,26 +229,17 @@ export default {
       this.burnDialogPersistency = true;
       try {
         const ethersService = new EthersService();
-        await ethersService.burnItem(1);
+        await ethersService.burnItem(parseInt(this.dataId));
 
-        const provider = new ethers.providers.Web3Provider(
-          window.ethereum,
-          "any"
-        );
-        const signer = provider.getSigner();
-        const contract = new ethers.Contract(
-          contractAddress,
-          DigiNFT.abi,
-          signer
-        );
+        const { provider, contract } = ethersService.instance();
         const _this = this;
         provider.once("block", () => {
           contract.once(
             {
-              topics: [utils.id("Burn(uint256)"), utils.hexValue(this.dataId)],
+              topics: [utils.id("Burn(uint256)")],
             },
             () => {
-              alert("lol!");
+              console.log("kekl");
               _this.burnDialogLoading = false;
               _this.burnDialogPersistency = false;
             }
@@ -244,3 +253,11 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+.grayscale {
+  filter: gray;
+  -webkit-filter: grayscale(1);
+  filter: grayscale(1);
+}
+</style>

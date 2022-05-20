@@ -4,7 +4,25 @@
       <v-card max-width="400">
         <v-img @load="redrawVueMasonry" height="250" :src="item.image" />
 
-        <v-card-title>{{ item.name }}</v-card-title>
+        <v-card-title
+          >{{ item.name }}
+          <v-chip
+            class="ma-2"
+            :color="item.sellable ? 'green' : 'error'"
+            text-color="white"
+            small
+          >
+            {{ item.sellable ? "Sellable" : "Not sellable" }}
+          </v-chip></v-card-title
+        >
+        <v-card-subtitle
+          >Owned by
+          {{
+            isThisMyItem(item.userAddress)
+              ? "you"
+              : item.userAddress.slice(0, 6)
+          }}
+        </v-card-subtitle>
 
         <v-card-text>
           <div>
@@ -22,7 +40,13 @@
         </v-tooltip>
 
         <v-card-actions>
-          <v-btn color="deep-purple lighten-2" text> Reserve </v-btn>
+          <v-btn
+            color="primary"
+            :to="{ name: 'ItemDetail', params: { id: item.id } }"
+            outlined
+          >
+            Details
+          </v-btn>
         </v-card-actions>
       </v-card>
     </v-col>
@@ -30,14 +54,19 @@
 </template>
 
 <script>
+import { mapGetters } from "vuex";
 import { ethers } from "ethers";
 import ItemService from "../services/item";
+import { ETHERS, ETHERS_CONNECTED_ACCOUNT } from "../store/actions/ethers";
 
 export default {
   name: "Explore",
   data: () => ({
     items: [],
   }),
+  computed: {
+    ...mapGetters(ETHERS, [ETHERS_CONNECTED_ACCOUNT]),
+  },
   created() {
     this.getItems();
   },
@@ -53,6 +82,12 @@ export default {
     },
     redrawVueMasonry() {
       this.$redrawVueMasonry();
+    },
+    isThisMyItem(userAddress) {
+      return (
+        this[ETHERS_CONNECTED_ACCOUNT].toLowerCase() ===
+        userAddress.toLowerCase()
+      );
     },
   },
 };
