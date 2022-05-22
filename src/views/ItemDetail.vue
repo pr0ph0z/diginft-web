@@ -27,7 +27,10 @@
             </v-tooltip>
           </v-card-text>
           <v-card-actions>
-            <v-btn v-if="!item.sellable && !isThisMyItem" color="error" text
+            <v-btn
+              v-if="!item.sellable && !isThisMyItem && !isItemBurned"
+              color="error"
+              text
               >Item is Not Sellable</v-btn
             >
             <v-btn v-if="isItemBurned" color="error" text>Item is Burned</v-btn>
@@ -86,9 +89,12 @@
                     <td>
                       <v-tooltip bottom>
                         <template v-slot:activator="{ on, attrs }">
-                          <span v-bind="attrs" v-on="on">{{
-                            log.createdAt | parseDate
-                          }}</span>
+                          <a
+                            v-bind="attrs"
+                            v-on="on"
+                            :href="`https://rinkeby.etherscan.io/tx/${log.hash}`"
+                            >{{ log.createdAt | parseDate }}</a
+                          >
                         </template>
                         <span>{{ log.createdAt | parseDateWithTime }}</span>
                       </v-tooltip>
@@ -140,7 +146,7 @@
 <script>
 import { mapGetters } from "vuex";
 import { format } from "date-fns";
-import { ethers, BigNumber, utils } from "ethers";
+import { ethers, BigNumber } from "ethers";
 import ItemService from "../services/item";
 import EthersService from "../services/ethers";
 import { ETHERS, ETHERS_CONNECTED_ACCOUNT } from "../store/actions/ethers";
@@ -228,24 +234,19 @@ export default {
       this.burnDialogLoading = true;
       this.burnDialogPersistency = true;
       try {
+        this.$socket.client.emit(`join-room`, `burn-${this.dataId}`);
         const ethersService = new EthersService();
         await ethersService.burnItem(parseInt(this.dataId));
 
-        const { provider, contract } = ethersService.instance();
         const _this = this;
-        provider.once("block", () => {
-          contract.once(
-            {
-              topics: [utils.id("Burn(uint256)")],
-            },
-            () => {
-              console.log("kekl");
-              _this.burnDialogLoading = false;
-              _this.burnDialogPersistency = false;
-            }
-          );
+        this.$socket.$subscribe("burn", () => {
+          _this.burnDialog = false;
+          _this.burnDialogLoading = false;
+          _this.burnDialogPersistency = false;
+          _this.getItem();
         });
       } catch (error) {
+        this.$root.showSnackbar(error.message, "error");
         this.burnDialogLoading = false;
         this.burnDialogPersistency = false;
       }
