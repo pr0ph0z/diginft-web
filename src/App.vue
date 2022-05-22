@@ -1,16 +1,20 @@
 <template>
-  <v-app>
-    <navbar />
-    <v-main>
-      <v-container>
-        <router-view />
-      </v-container>
-    </v-main>
-  </v-app>
+  <div>
+    <v-app>
+      <navbar />
+      <v-main ref="app">
+        <v-container>
+          <router-view />
+        </v-container>
+      </v-main>
+    </v-app>
+  </div>
 </template>
 
 <script>
+import Vue from "vue";
 import { mapActions } from "vuex";
+import Snackbar from "./components/Snackbar.vue";
 import Navbar from "./components/Navbar.vue";
 import ethereum from "./services/ethereum";
 import EthersService from "./services/ethers";
@@ -33,8 +37,37 @@ export default {
       });
     }
   },
+  mounted() {
+    this.$root.showSnackbar = this.showSnackbar;
+  },
   methods: {
     ...mapActions(ETHERS, [ETHERS_SET_ACCOUNT]),
+    showSnackbar(message, variant) {
+      const variants = {
+        success: {
+          color: "green",
+          button_color: "white",
+        },
+        warning: {
+          color: "orange darken-1",
+          button_color: "white",
+        },
+        error: {
+          color: "red accent-2",
+          button_color: "white",
+        },
+      };
+      const ComponentClass = Vue.extend(Snackbar);
+      const instance = new ComponentClass({
+        propsData: {
+          show: true,
+          content: message,
+          color: variants[variant],
+        },
+      });
+      instance.$mount();
+      this.$refs.app.$el.appendChild(instance.$el);
+    },
   },
 };
 </script>
