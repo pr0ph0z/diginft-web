@@ -41,6 +41,7 @@
               >Buy Item</v-btn
             ><v-btn
               v-if="isThisMyItem && !isItemBurned"
+              @click="updateItemDialog = true"
               color="primary"
               outlined
               >Update Item</v-btn
@@ -135,11 +136,58 @@
       v-model="burnDialog"
       :loading="burnDialogLoading"
       :handler="burn"
-      :persistent="burnDialogPersistency"
+      :persistent="burnDialogLoading"
       title="Burn Item?"
       description="This action is irreversible. Burning this item means the record won't be held in our smart contract anymore."
       textButton="Burn"
     />
+
+    <v-dialog
+      v-model="updateItemDialog"
+      max-width="350"
+      :persistent="updateItemLoading"
+    >
+      <v-card>
+        <v-card-title class="headline"> Update Item </v-card-title>
+        <v-divider />
+
+        <v-card-text class="mt-8">
+          <v-text-field
+            v-model="form.price"
+            :disabled="updateItemLoading"
+            label="Price"
+            suffix="Ξ"
+            type="number"
+            outlined
+          />
+          <v-text-field
+            v-model="form.royalty"
+            :disabled="updateItemLoading"
+            label="Royalty"
+            suffix="%"
+            type="number"
+            outlined
+          />
+          <v-switch v-model="form.sellable" :disabled="updateItemLoading" inset>
+            <template v-slot:label> Set as a sellable item </template>
+          </v-switch>
+        </v-card-text>
+        <v-divider />
+
+        <v-card-actions>
+          <v-spacer></v-spacer>
+
+          <v-btn
+            color="primary"
+            @click="updateItem"
+            :loading="updateItemLoading"
+            text
+          >
+            Update
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 
@@ -166,9 +214,15 @@ export default {
         username: "",
       },
     },
+    form: {
+      price: 0,
+      royalty: 0,
+      sellable: false,
+    },
     burnDialog: false,
     burnDialogLoading: false,
-    burnDialogPersistency: false,
+    updateItemDialog: false,
+    updateItemLoading: false,
   }),
   computed: {
     ...mapGetters(ETHERS, [ETHERS_CONNECTED_ACCOUNT]),
@@ -206,6 +260,9 @@ export default {
     async getItem() {
       const item = await ItemService.find(this.dataId);
       this.item = item.data.data;
+      this.form.price = ethers.utils.formatEther(this.item.price);
+      this.form.royalty = this.item.royalty / 100;
+      this.form.sellable = this.item.sellable;
     },
     async buyItem() {
       const ethersService = new EthersService();
@@ -232,7 +289,6 @@ export default {
     },
     async burn() {
       this.burnDialogLoading = true;
-      this.burnDialogPersistency = true;
       try {
         this.$socket.client.emit(`join-room`, `burn-${this.dataId}`);
         const ethersService = new EthersService();
@@ -242,13 +298,33 @@ export default {
         this.$socket.$subscribe("burn", () => {
           _this.burnDialog = false;
           _this.burnDialogLoading = false;
-          _this.burnDialogPersistency = false;
           _this.getItem();
         });
       } catch (error) {
         this.$root.showSnackbar(error.message, "error");
         this.burnDialogLoading = false;
-        this.burnDialogPersistency = false;
+      }
+    },
+    async updateItem() {
+      this.updateItemLoading = true;
+      try {
+        this.$socket.client.emit(`join-room`, `update-item-${this.dataId}`);
+        const ethersService = new EthersService();
+        await ethersService.updateItem(
+          this.item.id,
+          ethers.utils.parseEther(this.form.price),
+          parseInt(this.form.royalty) * 100,
+          this.form.sellable
+        );
+
+        const _this = this;
+        this.$socket.$subscribe("update-item", () => {
+          _this.updateItemDialog = false;
+          _this.updateItemLoading = false;
+          _this.getItem();
+        });
+      } catch (error) {
+        this.updateItemLoading = false;
       }
     },
   },

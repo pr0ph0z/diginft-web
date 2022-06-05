@@ -68,4 +68,14 @@ export default class EthersService {
 
     await burn.wait();
   }
+
+  async updateItem(itemId, price, royalty, sellable) {
+    const provider = new ethers.providers.Web3Provider(window.ethereum, "any");
+    const signer = provider.getSigner();
+    const contract = new ethers.Contract(contractAddress, DigiNFT.abi, signer);
+
+    const update = await contract.updateItem(itemId, price, royalty, sellable);
+
+    await update.wait();
+  }
 }

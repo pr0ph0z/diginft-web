@@ -4,6 +4,7 @@ import Home from "../views/Home.vue";
 import Explore from "../views/Explore.vue";
 import ItemDetail from "../views/ItemDetail.vue";
 import Mint from "../views/Mint.vue";
+import User from "../views/User.vue";
 
 Vue.use(VueRouter);
 
@@ -27,6 +28,11 @@ const routes = [
     path: "/mint",
     name: "Mint",
     component: Mint,
+  },
+  {
+    path: "/user/:id",
+    name: "User",
+    component: User,
   },
 ];
 

@@ -27,7 +27,7 @@
       Create
     </v-btn>
 
-    <v-btn @click="connectWallet" color="primary" outlined text>
+    <v-btn @click="profileButton" color="primary" outlined text>
       <span
         :class="`${
           ETHERS_IS_ACCOUNT_CONNECTED ? 'success' : 'warning'
@@ -44,6 +44,7 @@
 import { mapGetters } from "vuex";
 import {
   ETHERS,
+  ETHERS_CONNECTED_ACCOUNT,
   ETHERS_CONNECTED_ACCOUNT_ELLIPSIS,
   ETHERS_IS_ACCOUNT_CONNECTED,
 } from "../store/actions/ethers";
@@ -53,14 +54,27 @@ export default {
   name: "Navbar",
   computed: {
     ...mapGetters(ETHERS, [
+      ETHERS_CONNECTED_ACCOUNT,
       ETHERS_CONNECTED_ACCOUNT_ELLIPSIS,
       ETHERS_IS_ACCOUNT_CONNECTED,
     ]),
   },
   methods: {
+    async profileButton() {
+      if (this[ETHERS_IS_ACCOUNT_CONNECTED]) {
+        return this.toUserPage();
+      }
+      return await this.connectWallet();
+    },
     async connectWallet() {
       const ethersService = new EthersService();
       await ethersService.connectWallet();
+    },
+    toUserPage() {
+      this.$router.push({
+        name: "User",
+        params: { id: this[ETHERS_CONNECTED_ACCOUNT] },
+      });
     },
   },
 };
