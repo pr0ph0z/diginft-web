@@ -33,6 +33,7 @@ export default {
       eth.on("accountsChanged", async accounts => {
         if (accounts.length === 0) {
           this[ETHERS_SET_ACCOUNT]("");
+          localStorage.removeItem("walletAddress");
         }
       });
     }

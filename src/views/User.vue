@@ -9,9 +9,20 @@
             width="250"
           />
         </div>
-        <h1 class="text-center my-4 mb-0">
-          {{ displayName }}
-        </h1>
+        <div class="d-flex flex-inline align-center justify-center">
+          <h1 class="text-center my-4 mb-0">
+            {{ displayName }}
+          </h1>
+          <v-btn
+            :to="{ name: 'UpdateProfile' }"
+            class="d-flex align-center ml-2"
+            icon
+            color="grey lighten-1"
+            x-small
+          >
+            <v-icon>mdi-pencil</v-icon>
+          </v-btn>
+        </div>
         <p v-if="hasUserSetUsername" class="text--disabled text-center">
           {{ user.walletAddress }}
         </p>

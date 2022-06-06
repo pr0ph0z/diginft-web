@@ -18,6 +18,7 @@ export default {
   },
   actions: {
     [ETHERS_SET_ACCOUNT]: ({ commit }, account) => {
+      localStorage.setItem("walletAddress", account);
       commit(ETHERS_SET_ACCOUNT, account);
     },
     [ETHERS_SET_METAMASK_INSTALL_STATUS]: ({ commit }) => {

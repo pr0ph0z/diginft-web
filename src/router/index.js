@@ -5,6 +5,7 @@ import Explore from "../views/Explore.vue";
 import ItemDetail from "../views/ItemDetail.vue";
 import Mint from "../views/Mint.vue";
 import User from "../views/User.vue";
+import UpdateProfile from "../views/UpdateProfile.vue";
 
 Vue.use(VueRouter);
 
@@ -33,6 +34,11 @@ const routes = [
     path: "/user/:id",
     name: "User",
     component: User,
+  },
+  {
+    path: "/update-profile",
+    name: "UpdateProfile",
+    component: UpdateProfile,
   },
 ];
 
