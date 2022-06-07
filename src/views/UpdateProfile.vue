@@ -3,12 +3,6 @@
     <v-row class="fill-height">
       <v-col md="4" cols="12" offset-md="2">
         <h1>Update Profile</h1>
-        <avatar
-          :address="ETHERS_CONNECTED_ACCOUNT"
-          class="rounded-circle"
-          width="250"
-        />
-
         <v-form @submit.prevent="update" class="mt-2">
           <v-text-field
             v-model="username"
@@ -68,6 +62,9 @@ export default {
   computed: {
     ...mapGetters(ETHERS, [ETHERS_CONNECTED_ACCOUNT]),
   },
+  mounted() {
+    this.getUserProfile();
+  },
   methods: {
     async update() {
       this.updateLoading = true;
@@ -86,6 +83,13 @@ export default {
       } finally {
         this.updateLoading = false;
       }
+    },
+    async getUserProfile() {
+      const user = await UserService.find(this[ETHERS_CONNECTED_ACCOUNT]);
+      this.username = user.data.data.username;
+      this.twitterHandle = user.data.data.twitterHandle;
+      this.website = user.data.data.website;
+      this.bio = user.data.data.bio;
     },
   },
 };
