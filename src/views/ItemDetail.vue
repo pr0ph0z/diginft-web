@@ -72,20 +72,38 @@
                   <tr v-for="log in item.logs" :key="log.id">
                     <td>{{ log.type }}</td>
                     <td>
-                      <a href="#" class="text-decoration-none">{{
-                        log.fromAddress.toLowerCase() ===
-                        ETHERS_CONNECTED_ACCOUNT.toLowerCase()
-                          ? "you"
-                          : log.fromAddress.slice(0, 6)
-                      }}</a>
+                      <router-link
+                        :to="{
+                          name: 'User',
+                          params: { id: log.from.walletAddress },
+                        }"
+                        class="text-decoration-none"
+                        >{{
+                          log.from.walletAddress.toLowerCase() ===
+                          ETHERS_CONNECTED_ACCOUNT.toLowerCase()
+                            ? "you"
+                            : log.from.username !== null
+                            ? log.from.username
+                            : log.from.walletAddress.slice(0, 6)
+                        }}</router-link
+                      >
                     </td>
                     <td>
-                      <a href="#" class="text-decoration-none">{{
-                        log.toAddress.toLowerCase() ===
-                        ETHERS_CONNECTED_ACCOUNT.toLowerCase()
-                          ? "you"
-                          : log.toAddress.slice(0, 6)
-                      }}</a>
+                      <router-link
+                        :to="{
+                          name: 'User',
+                          params: { id: log.to.walletAddress },
+                        }"
+                        class="text-decoration-none"
+                        >{{
+                          log.to.walletAddress.toLowerCase() ===
+                          ETHERS_CONNECTED_ACCOUNT.toLowerCase()
+                            ? "you"
+                            : log.to.username !== null
+                            ? log.to.username
+                            : log.to.walletAddress.slice(0, 6)
+                        }}</router-link
+                      >
                     </td>
                     <td>
                       <v-tooltip bottom>
