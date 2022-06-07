@@ -3,17 +3,14 @@
     <v-row class="fill-height">
       <v-col md="3" cols="12" offset-md="2">
         <div class="d-flex justify-center">
-          <avatar
-            :address="ETHERS_CONNECTED_ACCOUNT"
-            class="rounded-circle"
-            width="250"
-          />
+          <avatar :address="id" class="rounded-circle" width="250" />
         </div>
         <div class="d-flex flex-inline align-center justify-center">
           <h1 class="text-center my-4 mb-0">
             {{ displayName }}
           </h1>
           <v-btn
+            v-if="id.toLowerCase() === ETHERS_CONNECTED_ACCOUNT.toLowerCase()"
             :to="{ name: 'UpdateProfile' }"
             class="d-flex align-center ml-2"
             icon
@@ -23,7 +20,22 @@
             <v-icon>mdi-pencil</v-icon>
           </v-btn>
         </div>
-        <p v-if="hasUserSetUsername" class="text--disabled text-center">
+        <div class="d-flex flex-inline justify-center mb-2">
+          <a
+            v-if="user.twitterHandle !== null"
+            :href="`https://twitter.com/${user.twitterHandle}`"
+          >
+            <v-icon> mdi-twitter </v-icon>
+          </a>
+          <a v-if="user.website !== null" :href="user.website" class="ml-2">
+            <v-icon> mdi-web </v-icon>
+          </a>
+        </div>
+        <p
+          v-if="hasUserSetUsername"
+          class="text--disabled text-center"
+          style="word-wrap: break-word"
+        >
           {{ user.walletAddress }}
         </p>
         <div class="d-flex justify-center">
@@ -125,6 +137,7 @@ export default {
       walletAddress: "",
       createdItem: [],
       ownedItem: [],
+      twitter: null,
     },
   }),
   components: {
@@ -193,5 +206,8 @@ export default {
 <style scoped>
 .stats > .stats-item:not(:last-child) {
   border-right: solid 1px rgba(0, 0, 0, 0.1);
+}
+a {
+  color: white !important;
 }
 </style>
