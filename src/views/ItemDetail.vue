@@ -288,7 +288,7 @@ export default {
       const marketItem = this.transformMarketItem(item);
       let price = BigNumber.from(marketItem.price);
       const ONE_HUNDRED_PERCENT = 10000;
-      if (marketItem.seller !== marketItem.owner) {
+      if (marketItem.creator !== marketItem.owner) {
         price = price
           .add(price.mul(marketItem.royalty).div(ONE_HUNDRED_PERCENT))
           .toString();
@@ -298,7 +298,7 @@ export default {
     transformMarketItem(marketItem) {
       return {
         tokenId: parseInt(marketItem.tokenId),
-        seller: marketItem.seller,
+        creator: marketItem.creator,
         owner: marketItem.owner,
         price: marketItem.price,
         royalty: parseInt(marketItem.royalty),
