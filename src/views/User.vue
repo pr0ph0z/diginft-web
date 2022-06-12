@@ -52,12 +52,21 @@
             </v-row>
           </v-sheet>
         </div>
+        <div class="d-flex justify-center mt-4">
+          <v-select
+            v-model="filter"
+            @change="filterItem"
+            :items="['Created', 'Owned', 'Favorited']"
+            label="Filter items"
+            outlined
+          ></v-select>
+        </div>
       </v-col>
       <v-col md="7" class="d-sm-flex">
         <v-divider class="d-sm-flex d-none" vertical />
         <v-row class="ml-2" v-masonry>
           <v-col
-            class="justify-center ml-auto mr-auto"
+            class="ml-auto mr-auto"
             v-for="item in items"
             :key="item.id"
             cols="12"
@@ -139,6 +148,9 @@ export default {
       ownedItem: [],
       twitter: null,
     },
+    radioGroup: "created",
+    items: [],
+    filter: "Created",
   }),
   components: {
     Avatar,
@@ -159,18 +171,6 @@ export default {
     hasUserSetUsername() {
       return this.user.username !== null;
     },
-    items() {
-      return [...this.user.createdItem, ...this.user.ownedItem].reduce(
-        (acc, curr) => {
-          if (acc.findIndex(data => data.id === curr.id) === -1) {
-            acc.push(curr);
-          }
-
-          return acc;
-        },
-        []
-      );
-    },
   },
   filters: {
     ellipsisWalletAddress(walletAddress) {
@@ -189,6 +189,7 @@ export default {
     async getUserProfile() {
       const user = await UserService.find(this.id);
       this.user = user.data.data;
+      this.filterItem();
     },
     redrawVueMasonry() {
       this.$redrawVueMasonry();
@@ -198,6 +199,19 @@ export default {
         this[ETHERS_CONNECTED_ACCOUNT].toLowerCase() ===
         userAddress.toLowerCase()
       );
+    },
+    filterItem() {
+      this.items = [];
+      if (this.filter === "Created") {
+        this.items = this.user.createdItem;
+      }
+      if (this.filter === "Owned") {
+        this.items = this.user.ownedItem;
+      }
+      const _this = this;
+      setTimeout(() => {
+        _this.redrawVueMasonry();
+      }, 50);
     },
   },
 };
