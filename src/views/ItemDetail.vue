@@ -8,7 +8,27 @@
           :class="`rounded-lg mx-auto fill-height${
             isItemBurned ? ' grayscale' : ''
           }`"
-        ></v-img>
+        >
+          <div
+            :class="item.favoritedBy.length !== 0 ? 'pr-2' : null"
+            style="
+              float: right;
+              background-color: white;
+              border-radius: 0px 0px 0px 15px;
+            "
+          >
+            <v-btn
+              @click="favoriteItem"
+              icon
+              :color="amIFavoritingThisItem ? 'pink' : 'grey'"
+            >
+              <v-icon>mdi-heart</v-icon>
+            </v-btn>
+            <span v-if="item.favoritedBy.length !== 0">{{
+              item.favoritedBy.length
+            }}</span>
+          </div>
+        </v-img>
       </v-col>
       <v-col md="4">
         <span class="text-h3 font-weight-bold">{{ item.name }}</span>
@@ -231,6 +251,7 @@ export default {
         walletAddress: "",
         username: "",
       },
+      favoritedBy: [],
     },
     form: {
       price: 0,
@@ -258,6 +279,15 @@ export default {
     },
     isItemBurned() {
       return this.item.user.walletAddress === this.nullAddress;
+    },
+    amIFavoritingThisItem() {
+      return (
+        this.item.favoritedBy.findIndex(
+          favorited =>
+            favorited.userAddress.toLowerCase() ===
+            this[ETHERS_CONNECTED_ACCOUNT].toLowerCase()
+        ) !== -1
+      );
     },
   },
   filters: {
@@ -343,6 +373,22 @@ export default {
         });
       } catch (error) {
         this.updateItemLoading = false;
+      }
+    },
+    async favoriteItem() {
+      if (this.amIFavoritingThisItem) {
+        await ItemService.unfavorite(this.dataId);
+        const itemIndex = this.item.favoritedBy.findIndex(
+          favorited =>
+            favorited.userAddress.toLowerCase() ===
+            this[ETHERS_CONNECTED_ACCOUNT].toLowerCase()
+        );
+        this.item.favoritedBy.splice(itemIndex, 1);
+      } else {
+        await ItemService.favorite(this.dataId);
+        this.item.favoritedBy.push({
+          userAddress: this[ETHERS_CONNECTED_ACCOUNT],
+        });
       }
     },
   },
