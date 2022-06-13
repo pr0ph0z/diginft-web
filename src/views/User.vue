@@ -49,6 +49,10 @@
                 <p class="text-h6 mb-0">{{ user.ownedItem.length }}</p>
                 <p class="mb-0">owned</p></v-col
               >
+              <v-col class="pa-4 stats-item text-center">
+                <p class="text-h6 mb-0">{{ user.favoritedItems.length }}</p>
+                <p class="mb-0">favorited</p></v-col
+              >
             </v-row>
           </v-sheet>
         </div>
@@ -146,6 +150,7 @@ export default {
       walletAddress: "",
       createdItem: [],
       ownedItem: [],
+      favoritedItems: [],
       twitter: null,
     },
     radioGroup: "created",
@@ -207,6 +212,9 @@ export default {
       }
       if (this.filter === "Owned") {
         this.items = this.user.ownedItem;
+      }
+      if (this.filter === "Favorited") {
+        this.items = this.user.favoritedItems.map(({ item }) => item);
       }
       const _this = this;
       setTimeout(() => {
