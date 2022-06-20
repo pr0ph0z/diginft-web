@@ -53,7 +53,7 @@
               text
               >Item is Not Sellable</v-btn
             >
-            <v-btn v-if="isItemBurned" color="error" text>Item is Burned</v-btn>
+            <v-btn v-if="isItemBurned" disabled text>Item is Burned</v-btn>
             <v-btn
               v-if="!isThisMyItem && !isItemBurned && item.sellable"
               @click="buyItem"
@@ -154,12 +154,16 @@
           <v-card-text>
             <span class="text--disabled"
               >Owned by
-              <a href="#" class="text-decoration-none">
+              <router-link
+                :to="{ name: 'User', params: { id: item.user.walletAddress } }"
+                href="#"
+                class="text-decoration-none"
+              >
                 {{
                   isThisMyItem
                     ? "you"
                     : item.user.username || item.user.walletAddress.slice(0, 6)
-                }}</a
+                }}</router-link
               ></span
             >
             <p class="text--primary mt-2">
@@ -394,11 +398,3 @@ export default {
   },
 };
 </script>
-
-<style scoped>
-.grayscale {
-  filter: gray;
-  -webkit-filter: grayscale(1);
-  filter: grayscale(1);
-}
-</style>

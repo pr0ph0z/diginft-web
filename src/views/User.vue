@@ -79,7 +79,14 @@
             lg="4"
           >
             <v-card max-width="400">
-              <v-img @load="redrawVueMasonry" height="250" :src="item.image" />
+              <v-img
+                @load="redrawVueMasonry"
+                height="250"
+                :class="`${
+                  item.userAddress === nullAddress ? 'grayscale' : null
+                }`"
+                :src="item.image"
+              />
 
               <v-card-title
                 >{{ item.name }}
@@ -107,7 +114,10 @@
                 </div>
               </v-card-text>
 
-              <v-tooltip bottom>
+              <v-btn v-if="item.userAddress === nullAddress" disabled text
+                >Item is Burned</v-btn
+              >
+              <v-tooltip v-else bottom>
                 <template v-slot:activator="{ on, attrs }">
                   <span v-bind="attrs" v-on="on" class="text-h6 pa-4"
                     >{{ item.price | weiToEther }}Ξ</span
@@ -134,7 +144,7 @@
 </template>
 
 <script>
-import { utils } from "ethers";
+import { ethers, utils } from "ethers";
 // import { create } from "ipfs-http-client";
 import { mapGetters } from "vuex";
 import { ETHERS, ETHERS_CONNECTED_ACCOUNT } from "../store/actions/ethers";
@@ -175,6 +185,9 @@ export default {
     },
     hasUserSetUsername() {
       return this.user.username !== null;
+    },
+    nullAddress() {
+      return ethers.constants.AddressZero;
     },
   },
   filters: {

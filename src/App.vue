@@ -72,3 +72,11 @@ export default {
   },
 };
 </script>
+
+<style>
+.grayscale {
+  filter: gray;
+  -webkit-filter: grayscale(1);
+  filter: grayscale(1);
+}
+</style>
