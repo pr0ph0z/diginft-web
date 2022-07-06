@@ -322,7 +322,11 @@ export default {
       const marketItem = this.transformMarketItem(item);
       let price = BigNumber.from(marketItem.price);
       const ONE_HUNDRED_PERCENT = 10000;
-      if (marketItem.creator !== marketItem.owner) {
+      if (
+        marketItem.creator !== marketItem.owner &&
+        marketItem.creator.toLowerCase() !==
+          this[ETHERS_CONNECTED_ACCOUNT].toLowerCase()
+      ) {
         price = price
           .add(price.mul(marketItem.royalty).div(ONE_HUNDRED_PERCENT))
           .toString();
