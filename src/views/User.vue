@@ -78,64 +78,11 @@
             md="6"
             lg="4"
           >
-            <v-card max-width="400">
-              <v-img
-                @load="redrawVueMasonry"
-                height="250"
-                :class="`${
-                  item.userAddress === nullAddress ? 'grayscale' : null
-                }`"
-                :src="item.image"
-              />
-
-              <v-card-title
-                >{{ item.name }}
-                <v-chip
-                  class="ma-2"
-                  :color="item.sellable ? 'green' : 'error'"
-                  text-color="white"
-                  small
-                >
-                  {{ item.sellable ? "Sellable" : "Not sellable" }}
-                </v-chip></v-card-title
-              >
-              <v-card-subtitle
-                >Owned by
-                {{
-                  isThisMyItem(item.userAddress)
-                    ? "you"
-                    : item.userAddress.slice(0, 6)
-                }}
-              </v-card-subtitle>
-
-              <v-card-text>
-                <div>
-                  {{ item.description }}
-                </div>
-              </v-card-text>
-
-              <v-btn v-if="item.userAddress === nullAddress" disabled text
-                >Item is Burned</v-btn
-              >
-              <v-tooltip v-else bottom>
-                <template v-slot:activator="{ on, attrs }">
-                  <span v-bind="attrs" v-on="on" class="text-h6 pa-4"
-                    >{{ item.price | weiToEther }}Ξ</span
-                  >
-                </template>
-                <span>{{ item.price | weiToEther }} ether</span>
-              </v-tooltip>
-
-              <v-card-actions>
-                <v-btn
-                  color="primary"
-                  :to="{ name: 'ItemDetail', params: { id: item.id } }"
-                  outlined
-                >
-                  Details
-                </v-btn>
-              </v-card-actions>
-            </v-card>
+            <item
+              :item="item"
+              :redrawVueMasonry="redrawVueMasonry"
+              :connectedAccount="ETHERS_CONNECTED_ACCOUNT"
+            />
           </v-col>
         </v-row>
       </v-col>
@@ -144,13 +91,11 @@
 </template>
 
 <script>
-import { ethers, utils } from "ethers";
-// import { create } from "ipfs-http-client";
 import { mapGetters } from "vuex";
 import { ETHERS, ETHERS_CONNECTED_ACCOUNT } from "../store/actions/ethers";
 import Avatar from "@/components/Avatar";
+import Item from "@/components/Item";
 import UserService from "@/services/user";
-// import EthersService from "../services/ethers";
 
 export default {
   name: "User",
@@ -169,6 +114,7 @@ export default {
   }),
   components: {
     Avatar,
+    Item,
   },
   computed: {
     ...mapGetters(ETHERS, [ETHERS_CONNECTED_ACCOUNT]),
@@ -186,19 +132,6 @@ export default {
     hasUserSetUsername() {
       return this.user.username !== null;
     },
-    nullAddress() {
-      return ethers.constants.AddressZero;
-    },
-  },
-  filters: {
-    ellipsisWalletAddress(walletAddress) {
-      if (walletAddress !== null) {
-        return `${walletAddress.slice(0, 5)}...${walletAddress.slice(-3)}`;
-      }
-    },
-    weiToEther(price) {
-      return utils.formatEther(price);
-    },
   },
   mounted() {
     this.getUserProfile();
@@ -211,12 +144,6 @@ export default {
     },
     redrawVueMasonry() {
       this.$redrawVueMasonry();
-    },
-    isThisMyItem(userAddress) {
-      return (
-        this[ETHERS_CONNECTED_ACCOUNT].toLowerCase() ===
-        userAddress.toLowerCase()
-      );
     },
     filterItem() {
       this.items = [];
