@@ -66,6 +66,12 @@
               outlined
               >Update Item</v-btn
             ><v-btn
+              v-if="wasThisMadeByMe"
+              @click="assignCollectionDialog = true"
+              color="primary"
+              outlined
+              >Assign Collection</v-btn
+            ><v-btn
               v-if="isThisMyItem && !isItemBurned"
               @click="burnDialog = true"
               color="error"
@@ -164,6 +170,16 @@
                     ? "you"
                     : item.user.username || item.user.walletAddress.slice(0, 6)
                 }}</router-link
+              >
+              <span v-if="item.collection !== null">
+                in
+                <router-link
+                  :to="{ name: 'CollectionDetail', params: { id: 0 } }"
+                  href="#"
+                  class="text-decoration-none"
+                >
+                  {{ item.collection.name }}</router-link
+                ></span
               ></span
             >
             <p class="text--primary mt-2">
@@ -230,6 +246,44 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+
+    <v-dialog
+      v-model="assignCollectionDialog"
+      max-width="350"
+      :persistent="assignCollectionLoading"
+    >
+      <v-card>
+        <v-card-title class="headline">
+          Assign Item To Collection
+        </v-card-title>
+        <v-divider />
+
+        <v-card-text class="mt-8">
+          <v-select
+            v-model="assignCollectionForm.collectionId"
+            :items="collections"
+            label="Collection"
+            item-text="name"
+            item-value="id"
+            outlined
+          ></v-select>
+        </v-card-text>
+        <v-divider />
+
+        <v-card-actions>
+          <v-spacer></v-spacer>
+
+          <v-btn
+            color="primary"
+            @click="assignCollection"
+            :loading="assignCollectionLoading"
+            text
+          >
+            Assign
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 
@@ -237,6 +291,7 @@
 import { mapGetters } from "vuex";
 import { format } from "date-fns";
 import { ethers, BigNumber } from "ethers";
+import CollectionService from "../services/collection";
 import ItemService from "../services/item";
 import EthersService from "../services/ethers";
 import { ETHERS, ETHERS_CONNECTED_ACCOUNT } from "../store/actions/ethers";
@@ -255,6 +310,10 @@ export default {
         walletAddress: "",
         username: "",
       },
+      collection: {
+        id: 0,
+        name: "",
+      },
       favoritedBy: [],
     },
     form: {
@@ -262,10 +321,16 @@ export default {
       royalty: 0,
       sellable: false,
     },
+    assignCollectionForm: {
+      collectionId: 0,
+    },
     burnDialog: false,
     burnDialogLoading: false,
     updateItemDialog: false,
     updateItemLoading: false,
+    assignCollectionDialog: false,
+    assignCollectionLoading: false,
+    collections: [],
   }),
   computed: {
     ...mapGetters(ETHERS, [ETHERS_CONNECTED_ACCOUNT]),
@@ -293,6 +358,12 @@ export default {
         ) !== -1
       );
     },
+    wasThisMadeByMe() {
+      return (
+        this.item.creator.walletAddress.toLowerCase() ===
+        this[ETHERS_CONNECTED_ACCOUNT].toLowerCase()
+      );
+    },
   },
   filters: {
     weiToEther(price) {
@@ -307,6 +378,7 @@ export default {
   },
   created() {
     this.getItem();
+    this.getCollections();
   },
   methods: {
     async getItem() {
@@ -397,6 +469,23 @@ export default {
         this.item.favoritedBy.push({
           userAddress: this[ETHERS_CONNECTED_ACCOUNT],
         });
+      }
+    },
+    async getCollections() {
+      const collections = await CollectionService.my();
+      this.collections = collections.data.data;
+    },
+    async assignCollection() {
+      this.assignCollectionLoading = true;
+      try {
+        await ItemService.assignCollection(
+          this.dataId,
+          this.assignCollectionForm.collectionId
+        );
+        await this.getItem();
+        this.assignCollectionDialog = false;
+      } finally {
+        this.assignCollectionLoading = false;
       }
     },
   },

@@ -6,6 +6,9 @@ import ItemDetail from "../views/ItemDetail.vue";
 import Mint from "../views/Mint.vue";
 import User from "../views/User.vue";
 import UpdateProfile from "../views/UpdateProfile.vue";
+import Collection from "../views/Collection.vue";
+import CollectionDetail from "../views/CollectionDetail.vue";
+import CollectionForm from "../views/CollectionForm.vue";
 
 Vue.use(VueRouter);
 
@@ -39,6 +42,26 @@ const routes = [
     path: "/update-profile",
     name: "UpdateProfile",
     component: UpdateProfile,
+  },
+  {
+    path: "/collection",
+    name: "Collection",
+    component: Collection,
+  },
+  {
+    path: "/collection/:id",
+    name: "CollectionDetail",
+    component: CollectionDetail,
+  },
+  {
+    path: "/create-collection",
+    name: "CreateCollection",
+    component: CollectionForm,
+  },
+  {
+    path: "/collection/:id/update",
+    name: "UpdateCollection",
+    component: CollectionForm,
   },
 ];
 

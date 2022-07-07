@@ -19,6 +19,16 @@
 
     <v-btn
       v-if="ETHERS_IS_ACCOUNT_CONNECTED"
+      :to="{ name: 'Collection' }"
+      class="mx-2"
+      color="primary"
+      text
+    >
+      Collection
+    </v-btn>
+
+    <v-btn
+      v-if="ETHERS_IS_ACCOUNT_CONNECTED"
       :to="{ name: 'Mint' }"
       class="mx-2"
       color="primary"

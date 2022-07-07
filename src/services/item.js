@@ -28,4 +28,13 @@ export default {
       }
     );
   },
+  assignCollection(id, collectionId) {
+    return api().patch(
+      `${moduleName}/${id}/assign-collection`,
+      { collectionId },
+      {
+        headers: authHeader(),
+      }
+    );
+  },
 };
