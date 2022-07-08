@@ -7,6 +7,7 @@
           <router-view :key="$route.fullPath" />
         </v-container>
       </v-main>
+      <snackbar-event />
     </v-app>
   </div>
 </template>
@@ -15,6 +16,7 @@
 import Vue from "vue";
 import { mapActions } from "vuex";
 import Snackbar from "./components/Snackbar.vue";
+import SnackbarEvent from "./components/SnackbarEvent.vue";
 import Navbar from "./components/Navbar.vue";
 import ethereum from "./services/ethereum";
 import EthersService from "./services/ethers";
@@ -24,6 +26,7 @@ export default {
   name: "App",
   components: {
     Navbar,
+    SnackbarEvent,
   },
   async beforeCreate() {
     const ethersService = new EthersService();

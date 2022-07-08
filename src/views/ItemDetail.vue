@@ -389,21 +389,25 @@ export default {
       this.form.sellable = this.item.sellable;
     },
     async buyItem() {
-      const ethersService = new EthersService();
-      const item = await ethersService.getMarketItem(this.item.id);
-      const marketItem = this.transformMarketItem(item);
-      let price = BigNumber.from(marketItem.price);
-      const ONE_HUNDRED_PERCENT = 10000;
-      if (
-        marketItem.creator !== marketItem.owner &&
-        marketItem.creator.toLowerCase() !==
-          this[ETHERS_CONNECTED_ACCOUNT].toLowerCase()
-      ) {
-        price = price
-          .add(price.mul(marketItem.royalty).div(ONE_HUNDRED_PERCENT))
-          .toString();
+      try {
+        const ethersService = new EthersService();
+        const item = await ethersService.getMarketItem(this.item.id);
+        const marketItem = this.transformMarketItem(item);
+        let price = BigNumber.from(marketItem.price);
+        const ONE_HUNDRED_PERCENT = 10000;
+        if (
+          marketItem.creator !== marketItem.owner &&
+          marketItem.creator.toLowerCase() !==
+            this[ETHERS_CONNECTED_ACCOUNT].toLowerCase()
+        ) {
+          price = price
+            .add(price.mul(marketItem.royalty).div(ONE_HUNDRED_PERCENT))
+            .toString();
+        }
+        await ethersService.buyItem(this.item.id, true, price);
+      } catch (error) {
+        this.$root.showSnackbar(error.message, "error");
       }
-      ethersService.buyItem(this.item.id, true, price);
     },
     transformMarketItem(marketItem) {
       return {
@@ -452,6 +456,7 @@ export default {
           _this.getItem();
         });
       } catch (error) {
+        this.$root.showSnackbar(error.message, "error");
         this.updateItemLoading = false;
       }
     },

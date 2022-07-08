@@ -71,10 +71,22 @@ export default {
   },
   methods: {
     async profileButton() {
-      if (this[ETHERS_IS_ACCOUNT_CONNECTED]) {
-        return this.toUserPage();
+      try {
+        if (this[ETHERS_IS_ACCOUNT_CONNECTED]) {
+          return this.toUserPage();
+        }
+        return await this.connectWallet();
+      } catch (error) {
+        if (
+          Object.prototype.hasOwnProperty.call(error, "code") &&
+          error.code === -32002
+        ) {
+          this.$root.showSnackbar(
+            "Already processing connect account. Check your Metamask prompt",
+            "error"
+          );
+        }
       }
-      return await this.connectWallet();
     },
     async connectWallet() {
       const ethersService = new EthersService();
