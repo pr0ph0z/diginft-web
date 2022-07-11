@@ -9,6 +9,28 @@
           <h1 class="text-center my-4 mb-0">
             {{ displayName }}
           </h1>
+          <a
+            v-if="user.twitterVerification !== null"
+            :href="user.twitterVerification.tweetUrl"
+          >
+            <v-tooltip top>
+              <template v-slot:activator="{ on, attrs }">
+                <v-btn
+                  v-bind="attrs"
+                  v-on="on"
+                  class="d-flex align-center mt-4"
+                  icon
+                  color="primary lighten-1"
+                >
+                  <v-icon>mdi-check-circle</v-icon>
+                </v-btn>
+              </template>
+              <span
+                >Twitter verified at
+                {{ user.twitterVerification.createdAt }}</span
+              >
+            </v-tooltip>
+          </a>
           <v-btn
             v-if="id.toLowerCase() === ETHERS_CONNECTED_ACCOUNT.toLowerCase()"
             :to="{ name: 'UpdateProfile' }"
@@ -106,6 +128,7 @@ export default {
       createdItem: [],
       ownedItem: [],
       favoritedItems: [],
+      twitterVerification: null,
       twitter: null,
     },
     radioGroup: "created",

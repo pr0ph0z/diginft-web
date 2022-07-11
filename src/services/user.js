@@ -12,4 +12,9 @@ export default {
       headers: authHeader(),
     });
   },
+  verifyTwitter(data) {
+    return api().post(`${moduleName}/verify-twitter`, data, {
+      headers: authHeader(),
+    });
+  },
 };
