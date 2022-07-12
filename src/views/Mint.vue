@@ -119,7 +119,7 @@ export default {
         const data = await client.add(JSON.stringify(metadata));
 
         const ethersService = new EthersService();
-        this.mintLoadingText = "Waiting transaction to be accepted...";
+        this.mintLoadingText = "Waiting the transaction to be accepted...";
         await ethersService.mint(
           `https://ipfs.infura.io/ipfs/${data.path}`,
           utils.parseEther(this.price),
