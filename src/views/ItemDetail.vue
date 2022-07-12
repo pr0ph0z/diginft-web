@@ -2,33 +2,58 @@
   <div>
     <v-row>
       <v-col md="4" offset-md="2">
-        <v-img
-          :src="item.image"
-          aspect-ratio="1"
-          :class="`rounded-lg mx-auto fill-height${
-            isItemBurned ? ' grayscale' : ''
-          }`"
-        >
-          <div
-            :class="item.favoritedBy.length !== 0 ? 'pr-2' : null"
-            style="
-              float: right;
-              background-color: white;
-              border-radius: 0px 0px 0px 15px;
-            "
-          >
-            <v-btn
-              @click="favoriteItem"
-              icon
-              :color="amIFavoritingThisItem ? 'pink' : 'grey'"
+        <v-hover>
+          <template v-slot:default="{ hover }">
+            <v-img
+              :src="item.image"
+              aspect-ratio="1"
+              :class="`rounded-lg mx-auto fill-height${
+                isItemBurned ? ' grayscale' : ''
+              }`"
             >
-              <v-icon>mdi-heart</v-icon>
-            </v-btn>
-            <span v-if="item.favoritedBy.length !== 0">{{
-              item.favoritedBy.length
-            }}</span>
-          </div>
-        </v-img>
+              <div
+                :class="item.favoritedBy.length !== 0 ? 'pr-2' : null"
+                style="
+                  float: right;
+                  background-color: white;
+                  border-radius: 0px 0px 0px 15px;
+                "
+              >
+                <v-btn icon :color="amIFavoritingThisItem ? 'pink' : 'grey'">
+                  <v-icon>mdi-heart</v-icon>
+                </v-btn>
+                <span v-if="item.favoritedBy.length !== 0">{{
+                  item.favoritedBy.length
+                }}</span>
+              </div>
+              <v-fade-transition>
+                <v-overlay v-if="hover" absolute color="grey">
+                  <v-btn
+                    @click="favoriteItem"
+                    :color="amIFavoritingThisItem ? 'pink' : 'grey'"
+                    icon
+                    x-large
+                    outlined
+                  >
+                    <v-icon>mdi-heart</v-icon> </v-btn
+                  ><v-btn
+                    @click="downloadOriginalFile"
+                    v-if="
+                      (isThisMyItem || wasThisMadeByMe) && item.file !== null
+                    "
+                    class="ml-2"
+                    color="primary"
+                    icon
+                    x-large
+                    outlined
+                  >
+                    <v-icon>mdi-download</v-icon>
+                  </v-btn>
+                </v-overlay>
+              </v-fade-transition>
+            </v-img>
+          </template>
+        </v-hover>
       </v-col>
       <v-col md="4">
         <span class="text-h3 font-weight-bold">{{ item.name }}</span>
@@ -306,6 +331,7 @@ export default {
     item: {
       price: 0,
       image: "",
+      file: null,
       user: {
         walletAddress: "",
         username: "",
@@ -313,6 +339,9 @@ export default {
       collection: {
         id: 0,
         name: "",
+      },
+      creator: {
+        walletAddress: "",
       },
       favoritedBy: [],
     },
@@ -492,6 +521,12 @@ export default {
       } finally {
         this.assignCollectionLoading = false;
       }
+    },
+    downloadOriginalFile() {
+      const link = document.createElement("a");
+      document.body.appendChild(link);
+      link.href = this.item.file;
+      link.click();
     },
   },
 };
