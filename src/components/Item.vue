@@ -108,7 +108,10 @@ export default {
   },
   methods: {
     isThisMyItem() {
-      return true;
+      return (
+        this.item.userAddress.toLowerCase() ===
+        this.connectedAccount.toLowerCase()
+      );
     },
   },
 };
