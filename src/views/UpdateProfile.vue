@@ -17,11 +17,26 @@
             label="Twitter Handle"
             counter="15"
             prefix="@"
-            color="warning"
-            hint="Your Twitter acount hasn't verified yet"
+            :color="
+              isTwitterVerified
+                ? isVerifiedTwitterAccountFormChanged
+                  ? 'warning'
+                  : 'success'
+                : 'warning'
+            "
+            :hint="
+              isTwitterVerified
+                ? isVerifiedTwitterAccountFormChanged
+                  ? 'Changing your Twitter handle means you\'ll lose the verification'
+                  : 'Your Twitter account is already verified'
+                : 'Your Twitter account hasn\'t verified yet'
+            "
             outlined
             ><template v-slot:append-outer>
-              <v-btn @click="verificationDialog = true" color="primary"
+              <v-btn
+                @click="verificationDialog = true"
+                :disabled="!isVerifiedTwitterAccountFormChanged"
+                color="primary"
                 >Verify</v-btn
               >
             </template>
@@ -166,6 +181,8 @@ export default {
     tweetSent: false,
     tweetUrl: "",
     verifySent: false,
+    isTwitterVerified: false,
+    verifiedTwitterAccount: "",
   }),
   computed: {
     ...mapGetters(ETHERS, [ETHERS_CONNECTED_ACCOUNT]),
@@ -214,6 +231,9 @@ export default {
 
       return false;
     },
+    isVerifiedTwitterAccountFormChanged() {
+      return this.twitterHandle !== this.verifiedTwitterAccount;
+    },
   },
   mounted() {
     this.getUserProfile();
@@ -243,6 +263,10 @@ export default {
       this.twitterHandle = user.data.data.twitterHandle;
       this.website = user.data.data.website;
       this.bio = user.data.data.bio;
+      this.isTwitterVerified = user.data.data.twitterVerification !== null;
+      if (user.data.data.twitterVerification !== null) {
+        this.verifiedTwitterAccount = user.data.data.twitterHandle;
+      }
     },
     submitTwitterHandle() {
       this.handleTwitterSubmitted = true;
