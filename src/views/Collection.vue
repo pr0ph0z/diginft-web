@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h1>My Collections</h1>
+    <h1>Community Collections</h1>
     <v-row class="mt-4" v-masonry>
       <v-col
         v-for="collection in collections"

@@ -37,4 +37,7 @@ export default {
       }
     );
   },
+  random() {
+    return api().get(`${moduleName}/random`);
+  },
 };

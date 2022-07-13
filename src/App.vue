@@ -3,7 +3,10 @@
     <v-app>
       <navbar />
       <v-main ref="app">
-        <v-container>
+        <v-container
+          :fluid="this.$route.name === 'Home'"
+          :class="this.$route.name === 'Home' ? 'pa-0' : ''"
+        >
           <router-view :key="$route.fullPath" />
         </v-container>
       </v-main>
