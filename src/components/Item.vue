@@ -21,9 +21,13 @@
     >
     <v-card-subtitle
       >Owned by
-      {{
-        isThisMyItem(item.userAddress) ? "you" : item.userAddress.slice(0, 6)
-      }}
+      <router-link
+        :to="{ name: 'User', params: { id: item.userAddress } }"
+        class="text-decoration-none"
+        >{{
+          isThisMyItem(item.userAddress) ? "you" : item.userAddress.slice(0, 6)
+        }}</router-link
+      >
     </v-card-subtitle>
 
     <v-card-text>
