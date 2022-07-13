@@ -61,7 +61,7 @@ export default {
     },
   },
   created() {
-    if (this.id !== null) {
+    if (this.id !== undefined) {
       this.findCollection();
     }
   },
