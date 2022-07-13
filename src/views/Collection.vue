@@ -18,6 +18,20 @@
           />
 
           <v-card-title>{{ collection.name }}</v-card-title>
+          <v-card-subtitle
+            >Collection by
+            <router-link
+              class="text-decoration-none"
+              :to="{ name: 'User', params: { id: collection.userAddress } }"
+              >{{
+                isThisMyItem(collection.userAddress)
+                  ? "you"
+                  : collection.user.username !== null
+                  ? collection.user.username
+                  : collection.userAddress.slice(0, 6)
+              }}</router-link
+            >
+          </v-card-subtitle>
 
           <v-card-text>
             <div>
@@ -76,6 +90,12 @@ export default {
     },
     redrawVueMasonry() {
       this.$redrawVueMasonry();
+    },
+    isThisMyItem(userAddress) {
+      return (
+        userAddress.toLowerCase() ===
+        this[ETHERS_CONNECTED_ACCOUNT].toLowerCase()
+      );
     },
   },
 };
