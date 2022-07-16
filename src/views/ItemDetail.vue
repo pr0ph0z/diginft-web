@@ -82,6 +82,8 @@
             <v-btn
               v-if="!isThisMyItem && !isItemBurned && item.sellable"
               @click="buyItem"
+              :disabled="buyItemLoading"
+              :loading="buyItemLoading"
               color="primary"
               >Buy Item</v-btn
             ><v-btn
@@ -360,6 +362,7 @@ export default {
     assignCollectionDialog: false,
     assignCollectionLoading: false,
     collections: [],
+    buyItemLoading: false,
   }),
   computed: {
     ...mapGetters(ETHERS, [ETHERS_CONNECTED_ACCOUNT]),
@@ -419,6 +422,8 @@ export default {
     },
     async buyItem() {
       try {
+        this.$socket.client.emit(`join-room`, `sale-${this.dataId}`);
+        this.buyItemLoading = true;
         const ethersService = new EthersService();
         const item = await ethersService.getMarketItem(this.item.id);
         const marketItem = this.transformMarketItem(item);
@@ -434,7 +439,14 @@ export default {
             .toString();
         }
         await ethersService.buyItem(this.item.id, true, price);
+
+        const _this = this;
+        this.$socket.$subscribe("burn", () => {
+          _this.buyItemLoading = false;
+          _this.getItem();
+        });
       } catch (error) {
+        this.buyItemLoading = false;
         this.$root.showSnackbar(error.message, "error");
       }
     },
