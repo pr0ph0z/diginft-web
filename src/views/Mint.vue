@@ -123,7 +123,7 @@ export default {
         await ethersService.mint(
           `https://ipfs.infura.io/ipfs/${data.path}`,
           utils.parseEther(this.price),
-          parseInt(this.royalty) * 10,
+          parseInt(this.royalty) * 100,
           this.sellable
         );
         this.mintLoadingText = "Minting token...";
