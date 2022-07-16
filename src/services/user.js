@@ -17,4 +17,13 @@ export default {
       headers: authHeader(),
     });
   },
+  sign(address) {
+    return api().post(
+      `${moduleName}/sign`,
+      { address },
+      {
+        headers: authHeader(),
+      }
+    );
+  },
 };

@@ -1,5 +1,6 @@
 import { ethers } from "ethers";
 import ethereum from "./ethereum";
+import UserService from "./user";
 import store from "../store";
 import { ETHERS, ETHERS_SET_ACCOUNT } from "../store/actions/ethers";
 import DigiNFT from "../../contract.json";
@@ -24,6 +25,7 @@ export default class EthersService {
     });
     if (accounts.length !== 0) {
       const account = accounts[0];
+      await UserService.sign(account);
       store.dispatch(`${ETHERS}/${ETHERS_SET_ACCOUNT}`, account);
     }
   }
