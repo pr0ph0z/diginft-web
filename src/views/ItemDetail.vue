@@ -441,7 +441,7 @@ export default {
         await ethersService.buyItem(this.item.id, true, price);
 
         const _this = this;
-        this.$socket.$subscribe("burn", () => {
+        this.$socket.$subscribe("sale", () => {
           _this.buyItemLoading = false;
           _this.getItem();
         });
