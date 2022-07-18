@@ -34,7 +34,11 @@
             <v-card-title>{{ item.name }}</v-card-title>
             <v-card-subtitle
               >Owned by
-              {{ item.userAddress.slice(0, 6) }}
+              <router-link
+                :to="{ name: 'User', params: { id: item.userAddress } }"
+                class="text-decoration-none"
+                >{{ item.userAddress.slice(0, 6) }}</router-link
+              >
             </v-card-subtitle>
           </v-card>
         </v-col>
