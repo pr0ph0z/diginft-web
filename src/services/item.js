@@ -4,8 +4,10 @@ import authHeader from "@/helpers/auth-header";
 const moduleName = "item";
 
 export default {
-  get() {
-    return api().get(`${moduleName}`);
+  get(search) {
+    return api().get(
+      `${moduleName}?${search !== null ? `search=${search}` : ""}`
+    );
   },
   find(id) {
     return api().get(`${moduleName}/${id}`);
