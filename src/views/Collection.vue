@@ -1,6 +1,28 @@
 <template>
   <div>
-    <h1>Community Collections</h1>
+    <v-row class="mb-2">
+      <v-col cols="12" md="8">
+        <h1>
+          {{
+            isSearchSubmitted
+              ? `Search Collections Result for "${search}"`
+              : "Community Collections"
+          }}
+        </h1>
+      </v-col>
+      <v-col cols="10" md="4">
+        <v-text-field
+          v-model="search"
+          @click:clear="clearSearch"
+          @click:append-outer="searchCollections"
+          append-outer-icon="mdi-magnify"
+          label="Search Collections"
+          single-line
+          hide-details
+          clearable
+        ></v-text-field>
+      </v-col>
+    </v-row>
     <v-row class="mt-4" v-masonry>
       <v-col
         v-for="collection in collections"
@@ -76,6 +98,8 @@ export default {
   name: "Collection",
   data: () => ({
     collections: [],
+    search: "",
+    isSearchSubmitted: false,
   }),
   computed: {
     ...mapGetters(ETHERS, [ETHERS_CONNECTED_ACCOUNT]),
@@ -84,8 +108,9 @@ export default {
     this.getCollections();
   },
   methods: {
-    async getCollections() {
-      const collections = await CollectionService.get();
+    async getCollections(search = null) {
+      this.collections = [];
+      const collections = await CollectionService.get(search);
       this.collections = collections.data.data;
     },
     redrawVueMasonry() {
@@ -96,6 +121,14 @@ export default {
         userAddress.toLowerCase() ===
         this[ETHERS_CONNECTED_ACCOUNT].toLowerCase()
       );
+    },
+    async clearSearch() {
+      this.isSearchSubmitted = false;
+      await this.getCollections(null);
+    },
+    async searchCollections() {
+      this.isSearchSubmitted = true;
+      await this.getCollections(this.search);
     },
   },
 };
