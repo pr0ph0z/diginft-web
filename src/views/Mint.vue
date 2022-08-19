@@ -100,19 +100,29 @@ export default {
         );
         let metadata = { name: this.name, description: this.description };
         this.mintLoading = true;
-        const client = create("https://ipfs.infura.io:5001/api/v0");
+        const auth = `Basic ${Buffer.from(
+          `${process.env.VUE_APP_INFURA_PROJECT_ID}:${process.env.VUE_APP_INFURA_KEY_SECRET}`
+        ).toString("base64")}`;
+        const client = create({
+          host: "ipfs.infura.io",
+          port: 5001,
+          protocol: "https",
+          headers: {
+            authorization: auth,
+          },
+        });
         this.mintLoadingText = "Uploading image to the IPFS...";
         const image = await client.add(this.image);
         metadata = {
           ...metadata,
-          image: `https://ipfs.infura.io/ipfs/${image.path}`,
+          image: `https://diginft.infura-ipfs.io/ipfs/${image.path}`,
         };
         if (this.file !== null) {
           this.mintLoadingText = "Uploading file to the IPFS...";
           const file = await client.add(this.file);
           metadata = {
             ...metadata,
-            file: `https://ipfs.infura.io/ipfs/${file.path}`,
+            file: `https://diginft.infura-ipfs.io/ipfs/${file.path}`,
           };
         }
         this.mintLoadingText = "Uploading metadata to the IPFS...";
@@ -121,7 +131,7 @@ export default {
         const ethersService = new EthersService();
         this.mintLoadingText = "Waiting the transaction to be accepted...";
         await ethersService.mint(
-          `https://ipfs.infura.io/ipfs/${data.path}`,
+          `https://diginft.infura-ipfs.io/ipfs/${data.path}`,
           utils.parseEther(this.price),
           parseInt(this.royalty) * 100,
           this.sellable
