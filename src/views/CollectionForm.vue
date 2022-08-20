@@ -70,8 +70,18 @@ export default {
       this.loading = true;
       try {
         let image = null;
-        const client = create("https://ipfs.infura.io:5001/api/v0");
         if (this.image !== null && typeof this.image !== "string") {
+          const auth = `Basic ${Buffer.from(
+            `${process.env.VUE_APP_INFURA_PROJECT_ID}:${process.env.VUE_APP_INFURA_KEY_SECRET}`
+          ).toString("base64")}`;
+          const client = create({
+            host: "ipfs.infura.io",
+            port: 5001,
+            protocol: "https",
+            headers: {
+              authorization: auth,
+            },
+          });
           image = await client.add(this.image);
         }
         if (this.id !== undefined) {
@@ -79,14 +89,14 @@ export default {
             name: this.name,
             description: this.description,
             ...(image !== null && {
-              image: `https://ipfs.infura.io/ipfs/${image.path}`,
+              image: `https://diginft.infura-ipfs.io/ipfs/${image.path}`,
             }),
           });
         } else {
           await CollectionService.create({
             name: this.name,
             description: this.description,
-            image: `https://ipfs.infura.io/ipfs/${image.path}`,
+            image: `https://diginft.infura-ipfs.io/ipfs/${image.path}`,
           });
         }
 
