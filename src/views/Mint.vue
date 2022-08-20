@@ -130,7 +130,7 @@ export default {
 
         const ethersService = new EthersService();
         this.mintLoadingText = "Waiting the transaction to be accepted...";
-        await ethersService.mint(
+        const mint = await ethersService.mint(
           `https://diginft.infura-ipfs.io/ipfs/${data.path}`,
           utils.parseEther(this.price),
           parseInt(this.royalty) * 100,
@@ -139,10 +139,14 @@ export default {
         this.mintLoadingText = "Minting token...";
 
         const _this = this;
-        this.$socket.$subscribe("mint", message => {
-          _this.$router.push({ name: "ItemDetail", params: { id: message } });
-        });
+        setTimeout(() => {
+          _this.$router.push({
+            name: "ItemDetail",
+            params: { id: mint.transactionIndex },
+          });
+        }, 3000);
       } catch (error) {
+        console.log(error);
         this.mintLoading = false;
       }
     },

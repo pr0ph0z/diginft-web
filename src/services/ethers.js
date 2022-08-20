@@ -37,7 +37,7 @@ export default class EthersService {
 
     const buy = await contract.buyItem(itemId, sellable, { value: price });
 
-    await buy.wait();
+    return buy.wait();
   }
 
   async getMarketItem(itemId) {
@@ -53,7 +53,7 @@ export default class EthersService {
   async burnItem(itemId) {
     const burn = await this.contract.burn(itemId);
 
-    await burn.wait();
+    return burn.wait();
   }
 
   async mint(metadataUrl, price, royalty, sellable) {
@@ -68,7 +68,7 @@ export default class EthersService {
       sellable
     );
 
-    await burn.wait();
+    return burn.wait();
   }
 
   async updateItem(itemId, price, royalty, sellable) {
@@ -78,6 +78,6 @@ export default class EthersService {
 
     const update = await contract.updateItem(itemId, price, royalty, sellable);
 
-    await update.wait();
+    return update.wait();
   }
 }

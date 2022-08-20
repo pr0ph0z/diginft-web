@@ -441,10 +441,10 @@ export default {
         await ethersService.buyItem(this.item.id, true, price);
 
         const _this = this;
-        this.$socket.$subscribe("sale", () => {
+        setTimeout(() => {
           _this.buyItemLoading = false;
           _this.getItem();
-        });
+        }, 3000);
       } catch (error) {
         this.buyItemLoading = false;
         this.$root.showSnackbar(error.message, "error");
@@ -468,11 +468,11 @@ export default {
         await ethersService.burnItem(parseInt(this.dataId));
 
         const _this = this;
-        this.$socket.$subscribe("burn", () => {
+        setTimeout(() => {
           _this.burnDialog = false;
           _this.burnDialogLoading = false;
           _this.getItem();
-        });
+        }, 3000);
       } catch (error) {
         this.$root.showSnackbar(error.message, "error");
         this.burnDialogLoading = false;
@@ -491,11 +491,11 @@ export default {
         );
 
         const _this = this;
-        this.$socket.$subscribe("update-item", () => {
+        setTimeout(() => {
           _this.updateItemDialog = false;
           _this.updateItemLoading = false;
           _this.getItem();
-        });
+        }, 3000);
       } catch (error) {
         this.$root.showSnackbar(error.message, "error");
         this.updateItemLoading = false;
