@@ -142,7 +142,7 @@ export default {
         setTimeout(() => {
           _this.$router.push({
             name: "ItemDetail",
-            params: { id: mint.transactionIndex },
+            params: { id: parseInt(mint.events[0].topics[3], 16) },
           });
         }, 3000);
       } catch (error) {
